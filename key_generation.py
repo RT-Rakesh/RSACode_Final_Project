@@ -1,5 +1,5 @@
 # Key Generation: Implement functions to generate RSA key pairs using the cryptography library.
-************************************************************************************************************************
+#************************************************************************************************************************
 
 # Importing modules from the cryptography library for handling cryptographic operations.
 from cryptography.hazmat.primitives import serialization
@@ -25,7 +25,18 @@ def generate_key_pair():
       
     return private_key, public_key
 
-************************************************************************************************************************
+def load_public_key(public_key_file):
+    with open(public_key_file, "rb") as public_key_in:
+        public_key_bytes = public_key_in.read()
+        public_key = serialization.load_pem_public_key(public_key_bytes)
+    return public_key
+
+def load_private_key(private_key_file):
+    with open(private_key_file, "rb") as private_key_in:
+        private_key_bytes = private_key_in.read()
+        private_key = serialization.load_pem_private_key(private_key_bytes, password=None)
+    return private_key
+#************************************************************************************************************************
 
 # File Encryption: Write functions to encrypt a file using the public key of the recipient and the RSA encryption scheme.
 
@@ -51,7 +62,7 @@ def encrypt_file(file_path, public_key, encrypted_file_path):
     with open(encrypted_file_path, 'wb') as encrypted_file:
         encrypted_file.write(encrypted_data)
 
-************************************************************************************************************************
+#************************************************************************************************************************
 
 # File Decryption: Create functions to decrypt an encrypted file using the corresponding private key and the RSA decryption scheme.
 
@@ -75,7 +86,7 @@ def decrypt_file(encrypted_file_path, private_key, decrypted_file_path):
     with open(decrypted_file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
 
-************************************************************************************************************************
+#************************************************************************************************************************
 
 # Hashing: Implement functions to generate a hash (e.g., SHA-256) of a file using the hashlib library.
 
@@ -95,7 +106,7 @@ def generate_file_hash(file_path):
     # Return the hexadecimal digest of the hash
     return hasher.hexdigest()
 
-************************************************************************************************************************
+#************************************************************************************************************************
 
 # Integrity Verification: Develop functions to verify the integrity of the received file by comparing its hash with the original hash.
 
@@ -106,7 +117,7 @@ def verify_integrity(file_path, original_hash):
     # Comparing the current hash with the original hash. If both hashes match, it returns True, indicating the file's integrity is verified. Else it returns False.
     return current_hash == original_hash
 
-************************************************************************************************************************
+#************************************************************************************************************************
 
 # User Interface
 def user_interface():
@@ -125,7 +136,7 @@ def user_interface():
 
         if choice == "1":
             # Generate RSA key pair
-            private_key, public_key = generate_rsa_key_pair()
+            private_key, public_key = generate_key_pair()
             print("RSA Key Pair generated successfully.")
 
         elif choice == "2":
@@ -148,9 +159,10 @@ def user_interface():
 
         elif choice == "4":
             # Verify integrity
-            file_path = input("Enter the path of the file to verify integrity: ")
-            original_hash = generate_file_hash(file_path)
-            if verify_integrity(file_path, original_hash):
+            original_file_path = input("Enter the path of the original file to verify integrity: ")
+            decrypted_file_path = input("Enter the path of the decrypted file: ")
+            original_hash = generate_file_hash(original_file_path)
+            if verify_integrity(decrypted_file_path, original_hash):
                 print("Integrity verified: The file remains unchanged.")
             else:
                 print("Integrity verification failed: The file has been tampered with.")
@@ -167,7 +179,7 @@ if __name__ == "__main__":
     user_interface()
 
 
-************************************************************************************************************************
+#************************************************************************************************************************
 
 ## Testing
 
@@ -177,7 +189,7 @@ import os
 class TestSecureFileTransfer(unittest.TestCase):
     def test_generate_rsa_key_pair(self):
         # Test generating RSA key pair
-        private_key, public_key = generate_rsa_key_pair()
+        private_key, public_key = generate_key_pair()
         self.assertIsNotNone(private_key)
         self.assertIsNotNone(public_key)
 
@@ -187,7 +199,7 @@ class TestSecureFileTransfer(unittest.TestCase):
         with open(file_path, "wb") as file:
             file.write(b"Test data")
 
-        private_key, public_key = generate_rsa_key_pair()
+        private_key, public_key = generate_key_pair()
         encrypted_file_path = "encrypted_test_file.bin"
         encrypt_file(file_path, public_key, encrypted_file_path)
         self.assertTrue(os.path.exists(encrypted_file_path))
