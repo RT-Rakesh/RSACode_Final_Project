@@ -102,28 +102,112 @@ def user_interface():
     print("Secure File Transfer System")
     print("---------------------------")
 
-    # Get user input for file path
-    file_path = input("Enter the path of the file to transfer: ")
+    while True:
+        print("\nMenu:")
+        print("1. Generate RSA Key Pair")
+        print("2. Encrypt File")
+        print("3. Decrypt File")
+        print("4. Verify Integrity")
+        print("5. Exit")
 
-    # Perform file transfer operations
-    recipient_private_key, recipient_public_key = generate_rsa_key_pair()
+        choice = input("Enter your choice: ")
 
-    encrypted_file_path = "encrypted_file.bin"
-    encrypt_file(file_path, recipient_public_key, encrypted_file_path)
-    print("File encrypted successfully.")
+        if choice == "1":
+            # Generate RSA key pair
+            private_key, public_key = generate_rsa_key_pair()
+            print("RSA Key Pair generated successfully.")
 
-    original_hash = generate_file_hash(file_path)
+        elif choice == "2":
+            # Encrypt file
+            file_path = input("Enter the path of the file to encrypt: ")
+            recipient_public_key_path = input("Enter the path of the recipient's public key: ")
+            encrypted_file_path = input("Enter the path to save the encrypted file: ")
+            public_key = load_public_key(recipient_public_key_path)
+            encrypt_file(file_path, public_key, encrypted_file_path)
+            print("File encrypted successfully.")
 
-    decrypted_file_path = "decrypted_file.txt"
-    decrypt_file(encrypted_file_path, recipient_private_key, decrypted_file_path)
-    print("File decrypted successfully.")
+        elif choice == "3":
+            # Decrypt file
+            encrypted_file_path = input("Enter the path of the encrypted file: ")
+            private_key_path = input("Enter the path of your private key: ")
+            decrypted_file_path = input("Enter the path to save the decrypted file: ")
+            private_key = load_private_key(private_key_path)
+            decrypt_file(encrypted_file_path, private_key, decrypted_file_path)
+            print("File decrypted successfully.")
 
-    # Verify integrity of the received file
-    if verify_integrity(decrypted_file_path, original_hash):
-        print("Integrity verified: The file remains unchanged.")
-    else:
-        print("Integrity verification failed: The file has been tampered with.")
+        elif choice == "4":
+            # Verify integrity
+            file_path = input("Enter the path of the file to verify integrity: ")
+            original_hash = generate_file_hash(file_path)
+            if verify_integrity(file_path, original_hash):
+                print("Integrity verified: The file remains unchanged.")
+            else:
+                print("Integrity verification failed: The file has been tampered with.")
+
+        elif choice == "5":
+            # Exit the program
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice. Please enter a valid option.")
 
 if __name__ == "__main__":
     user_interface()
+
+
+************************************************************************************************************************
+
+## Testing
+
+import unittest
+import os
+
+class TestSecureFileTransfer(unittest.TestCase):
+    def test_generate_rsa_key_pair(self):
+        # Test generating RSA key pair
+        private_key, public_key = generate_rsa_key_pair()
+        self.assertIsNotNone(private_key)
+        self.assertIsNotNone(public_key)
+
+    def test_file_encryption_decryption(self):
+        # Test file encryption and decryption
+        file_path = "test_file.txt"
+        with open(file_path, "wb") as file:
+            file.write(b"Test data")
+
+        private_key, public_key = generate_rsa_key_pair()
+        encrypted_file_path = "encrypted_test_file.bin"
+        encrypt_file(file_path, public_key, encrypted_file_path)
+        self.assertTrue(os.path.exists(encrypted_file_path))
+
+        decrypted_file_path = "decrypted_test_file.txt"
+        decrypt_file(encrypted_file_path, private_key, decrypted_file_path)
+        self.assertTrue(os.path.exists(decrypted_file_path))
+
+        with open(decrypted_file_path, "rb") as file:
+            decrypted_data = file.read()
+            self.assertEqual(decrypted_data, b"Test data")
+
+    def test_generate_file_hash(self):
+        # Test generating file hash
+        file_path = "test_file.txt"
+        with open(file_path, "wb") as file:
+            file.write(b"Test data")
+
+        file_hash = generate_file_hash(file_path)
+        self.assertEqual(file_hash, "532eaabd9574880dbf76b9b8cc00832c20a6ec113d682299550d7a6e0f3454f6")
+
+    def test_verify_integrity(self):
+        # Test verifying integrity of the file
+        file_path = "test_file.txt"
+        with open(file_path, "wb") as file:
+            file.write(b"Test data")
+
+        original_hash = generate_file_hash(file_path)
+        self.assertTrue(verify_integrity(file_path, original_hash))
+
+if __name__ == "__main__":
+    unittest.main()
+
 
