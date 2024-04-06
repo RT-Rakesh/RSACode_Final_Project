@@ -13,6 +13,3 @@ def generate_key_pair():
     )
     public_key = private_key.public_key()   
     return private_key, public_key
-
-# Example usage:
-private_key, public_key = generate_key_pair()
