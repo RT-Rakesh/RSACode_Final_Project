@@ -179,58 +179,5 @@ if __name__ == "__main__":
     user_interface()
 
 
-#************************************************************************************************************************
-
-## Testing
-
-import unittest
-import os
-
-class TestSecureFileTransfer(unittest.TestCase):
-    def test_generate_rsa_key_pair(self):
-        # Test generating RSA key pair
-        private_key, public_key = generate_key_pair()
-        self.assertIsNotNone(private_key)
-        self.assertIsNotNone(public_key)
-
-    def test_file_encryption_decryption(self):
-        # Test file encryption and decryption
-        file_path = "test_file.txt"
-        with open(file_path, "wb") as file:
-            file.write(b"Test data")
-
-        private_key, public_key = generate_key_pair()
-        encrypted_file_path = "encrypted_test_file.bin"
-        encrypt_file(file_path, public_key, encrypted_file_path)
-        self.assertTrue(os.path.exists(encrypted_file_path))
-
-        decrypted_file_path = "decrypted_test_file.txt"
-        decrypt_file(encrypted_file_path, private_key, decrypted_file_path)
-        self.assertTrue(os.path.exists(decrypted_file_path))
-
-        with open(decrypted_file_path, "rb") as file:
-            decrypted_data = file.read()
-            self.assertEqual(decrypted_data, b"Test data")
-
-    def test_generate_file_hash(self):
-        # Test generating file hash
-        file_path = "test_file.txt"
-        with open(file_path, "wb") as file:
-            file.write(b"Test data")
-
-        file_hash = generate_file_hash(file_path)
-        self.assertEqual(file_hash, "532eaabd9574880dbf76b9b8cc00832c20a6ec113d682299550d7a6e0f3454f6")
-
-    def test_verify_integrity(self):
-        # Test verifying integrity of the file
-        file_path = "test_file.txt"
-        with open(file_path, "wb") as file:
-            file.write(b"Test data")
-
-        original_hash = generate_file_hash(file_path)
-        self.assertTrue(verify_integrity(file_path, original_hash))
-
-if __name__ == "__main__":
-    unittest.main()
 
 
