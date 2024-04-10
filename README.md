@@ -1,7 +1,7 @@
 # This is our Information Security Final Project. We are a group of three people :
 1. Manoj Sharma - 2330575
-2. Thuvaarakkesh Ramanathan - 202331425
-3. Omid Moridnejad - 202331293
+2. Thuvaarakkesh Ramanathan - 2331425
+3. Omid Moridnejad - 2331293
 
 Here we covering the following steps in this repository:
 
