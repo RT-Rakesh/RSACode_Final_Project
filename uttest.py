@@ -1,4 +1,4 @@
-from key_generation import *
+from function import *
 import unittest
 import os
 
